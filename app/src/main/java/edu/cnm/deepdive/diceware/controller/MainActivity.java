@@ -1,6 +1,8 @@
 package edu.cnm.deepdive.diceware.controller;
 
+import android.content.ReceiverCallNotAllowedException;
 import android.os.Bundle;
+import android.util.Log;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -10,11 +12,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import edu.cnm.deepdive.diceware.R;
-import edu.cnm.deepdive.diceware.model.Passphrase;
 import edu.cnm.deepdive.diceware.service.DicewareService;
 import edu.cnm.deepdive.diceware.service.GoogleSignInService;
 import edu.cnm.deepdive.diceware.view.PassphraseAdapter;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -37,17 +37,16 @@ public class MainActivity extends AppCompatActivity {
     });
     RecyclerView passphraseList = findViewById(R.id.keyword_list);
     GoogleSignInService.getInstance().getAccount().observe(this, (account) -> {
-      String token= getString(R.string.oauth_header, account.getIdToken());
+      String token = getString(R.string.oauth_header, account.getIdToken());
+      Log.d("Oauth2.0 token", token);
       DicewareService.getInstance().getAll(token)
           .subscribeOn(Schedulers.io())
           .observeOn(AndroidSchedulers.mainThread())
           .subscribe((passphrases) -> {
-            PassphraseAdapter adapter = new PassphraseAdapter(this,passphrases);
+            PassphraseAdapter adapter = new PassphraseAdapter(this, passphrases);
             passphraseList.setAdapter(adapter);
           });
     });
-
-
   }
 
   @Override
