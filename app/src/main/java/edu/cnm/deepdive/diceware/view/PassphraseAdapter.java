@@ -16,25 +16,27 @@ public class PassphraseAdapter extends RecyclerView.Adapter<Holder> {
 
   private final Context context;
   private final List<Passphrase> passphrases;
-
+  private final OnPassphraseClickListener clickListener;
 
   public PassphraseAdapter(Context context,
-      List<Passphrase> passphrases) {
+      List<Passphrase> passphrases,
+      OnPassphraseClickListener clickListener) {
     this.context = context;
     this.passphrases = passphrases;
+    this.clickListener = clickListener;
   }
 
   @NonNull
   @Override
   public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-    View view= LayoutInflater.from(context).inflate(R.layout.passphrase_item, parent, false);
+    View view = LayoutInflater.from(context).inflate(R.layout.passphrase_item, parent, false);
     return new Holder(view);
   }
 
   @Override
   public void onBindViewHolder(@NonNull Holder holder, int position) {
     Passphrase passphrase = passphrases.get(position);
-    holder.bind(passphrase);
+    holder.bind(position, passphrase);
   }
 
   @Override
@@ -48,11 +50,23 @@ public class PassphraseAdapter extends RecyclerView.Adapter<Holder> {
 
     private Holder(@NonNull View itemView) {
       super(itemView);
-      view= itemView;
+      view = itemView;
     }
 
-    private void bind(Passphrase passphrase) {
+    private void bind(int position, Passphrase passphrase) {
       ((TextView) view).setText(passphrase.getKey());
+      if (clickListener != null) {
+        view.setOnClickListener((v) -> clickListener.click(v, position, passphrase));
+      }
     }
+
   }
+
+  @FunctionalInterface
+  public interface OnPassphraseClickListener {
+
+    void click(View view, int position, Passphrase passphrase);
+
+  }
+
 }
