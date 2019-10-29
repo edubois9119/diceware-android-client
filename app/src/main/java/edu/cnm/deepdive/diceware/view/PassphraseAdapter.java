@@ -2,6 +2,7 @@ package edu.cnm.deepdive.diceware.view;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -17,13 +18,16 @@ public class PassphraseAdapter extends RecyclerView.Adapter<Holder> {
   private final Context context;
   private final List<Passphrase> passphrases;
   private final OnPassphraseClickListener clickListener;
+  private final OnPassphraseContextClickListener contextClickListener;
 
   public PassphraseAdapter(Context context,
       List<Passphrase> passphrases,
-      OnPassphraseClickListener clickListener) {
+      OnPassphraseClickListener clickListener,
+      OnPassphraseContextClickListener contextClickListener) {
     this.context = context;
     this.passphrases = passphrases;
     this.clickListener = clickListener;
+    this.contextClickListener = contextClickListener;
   }
 
   @NonNull
@@ -58,6 +62,10 @@ public class PassphraseAdapter extends RecyclerView.Adapter<Holder> {
       if (clickListener != null) {
         view.setOnClickListener((v) -> clickListener.click(v, position, passphrase));
       }
+      if (contextClickListener != null){
+        view.setOnCreateContextMenuListener((menu, v, menuInfo)->
+            contextClickListener.click(menu, position, passphrase));
+      }
     }
 
   }
@@ -66,7 +74,12 @@ public class PassphraseAdapter extends RecyclerView.Adapter<Holder> {
   public interface OnPassphraseClickListener {
 
     void click(View view, int position, Passphrase passphrase);
+  }
 
+  @FunctionalInterface
+  public interface OnPassphraseContextClickListener {
+
+    void click(Menu menu, int position, Passphrase passphrase);
   }
 
 }

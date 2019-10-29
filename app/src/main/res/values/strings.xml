@@ -4,4 +4,5 @@
   <string name="login_failure_message">Unable to log in with Google Sign In.</string>
   <string name="oauth_header">Bearer %s</string>
   <string name="sign_out">Sign out</string>
+  <string name="delete_passphrase">Delete</string>
 </resources>
