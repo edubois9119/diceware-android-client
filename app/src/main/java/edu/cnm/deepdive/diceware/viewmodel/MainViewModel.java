@@ -30,20 +30,34 @@ public class MainViewModel extends AndroidViewModel {
   public LiveData<List<Passphrase>> getPassphrases() {
     return passphrases;
   }
+
   public void setAccount(GoogleSignInAccount account) {
     this.account.setValue(account);
     if (account != null) {
-      String token = getApplication().getString(R.string.oauth_header, account.getIdToken());
-      Log.d("Oauth2.0 token", token);  //FIXME Remove before Shipping
-      DicewareService.getInstance().getAll(token)
-          .subscribeOn(Schedulers.io())
-          .subscribe((passphrases) -> {
-            this.passphrases.postValue(passphrases);
-          });
-
+      refreshPassphrase(account);
     }else {
       passphrases.setValue(Collections.EMPTY_LIST);
     }
+  }
+
+  public void deletePassphrase(Passphrase passphrase) {
+    GoogleSignInAccount account= this.account.getValue();
+    if(passphrase != null && passphrase.getId() >0 && account != null) {
+      String token = getApplication().getString(R.string.oauth_header, account.getIdToken());
+      DicewareService.getInstance().delete(token, passphrase.getId())
+          .subscribeOn(Schedulers.io())
+          .subscribe(()-> refreshPassphrase(account));
+    }
+  }
+
+  private void refreshPassphrase(GoogleSignInAccount account) {
+    String token = getApplication().getString(R.string.oauth_header, account.getIdToken());
+    Log.d("Oauth2.0 token", token);  //FIXME Remove before Shipping
+    DicewareService.getInstance().getAll(token)
+        .subscribeOn(Schedulers.io())
+        .subscribe((passphrases) -> {
+          this.passphrases.postValue(passphrases);
+        });
   }
 
 }
